@@ -1,34 +1,47 @@
 from lark import Token, Transformer, v_args
 
+from .ast_nodes import (
+    AnyASTNode,
+    BareVariableRefNode,
+    BinaryOpNode,
+    CurrentRefNode,
+    ExpressionAST,
+    NumberLiteralNode,
+    ParentRefNode,
+    StringLiteralNode,
+    UnaryOpNode,
+    VariableRefNode,
+)
 
-class AstTransformer(Transformer):
-    def number_literal(self, items):
+
+class AstTransformer(Transformer[Token, AnyASTNode]):
+    def number_literal(self, items: list[Token]) -> NumberLiteralNode:
         return {"type": "number_literal", "value": float(items[0].value)}
 
-    def string_literal(self, items):
+    def string_literal(self, items: list[Token]) -> StringLiteralNode:
         return {"type": "string_literal", "value": items[0].value[1:-1]}
 
-    def variable_ref(self, items):
+    def variable_ref(self, items: list[Token]) -> VariableRefNode:
         return {"type": "variable_ref", "name": items[0].value[2:-1]}
 
-    def bare_variable_ref(self, items):
+    def bare_variable_ref(self, items: list[Token]) -> BareVariableRefNode:
         return {"type": "bare_variable_ref", "name": items[0].value}
 
-    def current_ref(self, items):
+    def current_ref(self, _) -> CurrentRefNode:
         return {"type": "current_ref"}
 
-    def parent_ref(self, items):
+    def parent_ref(self, _) -> ParentRefNode:
         return {"type": "parent_ref"}
 
     @v_args(inline=True)
-    def unary_minus(self, minus_token: Token, operand_expression):
+    def unary_minus(self, _: Token, operand_expression: AnyASTNode) -> UnaryOpNode:
         return {
             "type": "unary_op",
             "operator": "unary_minus",
             "operand": operand_expression,
         }
 
-    def add(self, items):
+    def add(self, items: list[AnyASTNode]) -> BinaryOpNode:
         return {
             "type": "binary_op",
             "operator": "add",
@@ -36,7 +49,7 @@ class AstTransformer(Transformer):
             "right": items[2],
         }
 
-    def subtract(self, items):
+    def subtract(self, items: list[AnyASTNode]) -> BinaryOpNode:
         return {
             "type": "binary_op",
             "operator": "subtract",
@@ -44,7 +57,7 @@ class AstTransformer(Transformer):
             "right": items[2],
         }
 
-    def multiply(self, items):
+    def multiply(self, items: list[AnyASTNode]) -> BinaryOpNode:
         return {
             "type": "binary_op",
             "operator": "multiply",
@@ -52,7 +65,7 @@ class AstTransformer(Transformer):
             "right": items[2],
         }
 
-    def divide(self, items):
+    def divide(self, items: list[AnyASTNode]) -> BinaryOpNode:
         return {
             "type": "binary_op",
             "operator": "divide",
@@ -60,7 +73,7 @@ class AstTransformer(Transformer):
             "right": items[2],
         }
 
-    def eq(self, items):
+    def eq(self, items: list[AnyASTNode]) -> BinaryOpNode:
         return {
             "type": "binary_op",
             "operator": "eq",
@@ -68,7 +81,7 @@ class AstTransformer(Transformer):
             "right": items[2],
         }
 
-    def ne(self, items):
+    def ne(self, items: list[AnyASTNode]) -> BinaryOpNode:
         return {
             "type": "binary_op",
             "operator": "ne",
@@ -76,7 +89,7 @@ class AstTransformer(Transformer):
             "right": items[2],
         }
 
-    def lt(self, items):
+    def lt(self, items: list[AnyASTNode]) -> BinaryOpNode:
         return {
             "type": "binary_op",
             "operator": "lt",
@@ -84,7 +97,7 @@ class AstTransformer(Transformer):
             "right": items[2],
         }
 
-    def gt(self, items):
+    def gt(self, items: list[AnyASTNode]) -> BinaryOpNode:
         return {
             "type": "binary_op",
             "operator": "gt",
@@ -92,7 +105,7 @@ class AstTransformer(Transformer):
             "right": items[2],
         }
 
-    def lte(self, items):
+    def lte(self, items: list[AnyASTNode]) -> BinaryOpNode:
         return {
             "type": "binary_op",
             "operator": "lte",
@@ -100,7 +113,7 @@ class AstTransformer(Transformer):
             "right": items[2],
         }
 
-    def gte(self, items):
+    def gte(self, items: list[AnyASTNode]) -> BinaryOpNode:
         return {
             "type": "binary_op",
             "operator": "gte",
@@ -108,7 +121,7 @@ class AstTransformer(Transformer):
             "right": items[2],
         }
 
-    def logical_or(self, items):
+    def logical_or(self, items: list[AnyASTNode]) -> BinaryOpNode:
         return {
             "type": "binary_op",
             "operator": "or",
@@ -116,7 +129,7 @@ class AstTransformer(Transformer):
             "right": items[2],
         }
 
-    def logical_and(self, items):
+    def logical_and(self, items: list[AnyASTNode]) -> BinaryOpNode:
         return {
             "type": "binary_op",
             "operator": "and",
@@ -124,7 +137,7 @@ class AstTransformer(Transformer):
             "right": items[2],
         }
 
-    def function_call(self, items):
+    def function_call(self, items: list[Token]):
         function_name_token = items[0]
         # Arguments are items[1], items[2], ..., excluding COMMA tokens
         # Lark passes the children of the rule. For `NAME LPAR (logical_or_expr (COMMA logical_or_expr)*)? RPAR`,
@@ -158,37 +171,39 @@ class AstTransformer(Transformer):
         return {"type": "function_call", "name": function_name, "arguments": arguments}
 
     @v_args(inline=True)
-    def parentheses(self, lpar_token, expression, rpar_token):
+    def parentheses(
+        self, lpar_token: AnyASTNode, expression: ExpressionAST, rpar_token: AnyASTNode
+    ) -> ExpressionAST:
         return expression
 
     @v_args(inline=True)
-    def atom(self, child):
+    def atom(self, child: AnyASTNode) -> AnyASTNode:
         return child
 
     @v_args(inline=True)
-    def unary_expr(self, child):
+    def unary_expr(self, child: AnyASTNode) -> AnyASTNode:
         return child
 
     @v_args(inline=True)
-    def multiplicative_expr(self, child):
+    def multiplicative_expr(self, child: AnyASTNode) -> AnyASTNode:
         return child
 
     @v_args(inline=True)
-    def additive_expr(self, child):
+    def additive_expr(self, child: AnyASTNode) -> AnyASTNode:
         return child
 
     @v_args(inline=True)
-    def comparison_expr(self, child):
+    def comparison_expr(self, child: AnyASTNode) -> AnyASTNode:
         return child
 
     @v_args(inline=True)
-    def logical_and_expr(self, child):
+    def logical_and_expr(self, child: AnyASTNode) -> AnyASTNode:
         return child
 
     @v_args(inline=True)
-    def logical_or_expr(self, child):
+    def logical_or_expr(self, child: AnyASTNode) -> AnyASTNode:
         return child
 
     @v_args(inline=True)
-    def start(self, child):
+    def start(self, child: AnyASTNode) -> ExpressionAST:
         return child
