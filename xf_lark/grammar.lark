@@ -1,5 +1,5 @@
 %import common.WS
-%import common.SIGNED_NUMBER -> NUMBER
+%import common.NUMBER
 %ignore WS
 
 VARIABLE: /\$\{[_A-Za-z][A-Za-z0-9_.-]*\}/

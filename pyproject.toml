@@ -9,10 +9,11 @@ dependencies = [
     "lark>=1.2.2",
     "pytest>=8.3.5",
     "pytest-sugar>=1.0.0",
+    "typer>=0.15.3",
 ]
 
 [project.scripts]
-xf_parse = "xf_lark.cli:main"
+xf_parse = "xf_lark.cli:app"
 
 [tool.uv]
 package = true
