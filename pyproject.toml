@@ -1,0 +1,18 @@
+[project]
+name = "xf-lark"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "click>=8.1.8",
+    "lark>=1.2.2",
+    "pytest>=8.3.5",
+    "pytest-sugar>=1.0.0",
+]
+
+[project.scripts]
+xf_parse = "xf_lark.cli:main"
+
+[tool.uv]
+package = true

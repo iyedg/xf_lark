@@ -1,0 +1,63 @@
+%import common.WS
+%import common.SIGNED_NUMBER -> NUMBER
+%ignore WS
+
+VARIABLE: /\$\{[_A-Za-z][A-Za-z0-9_.-]*\}/
+STRING: /'[^']*'|"[^"]*"/
+PLUS: "+"
+MINUS: "-"
+MUL: "*"
+DIV: "div"
+LPAR: "("
+RPAR: ")"
+COMMA: ","
+NAME: /[_A-Za-z][A-Za-z0-9_-]*/
+CURRENT: "."
+PARENT: ".."
+EQ: "="
+NE: "!="
+LT: "<"
+GT: ">"
+LTE: "<="
+GTE: ">="
+AND: "and"
+OR: "or"
+
+?start: logical_or_expr
+
+logical_or_expr: logical_and_expr
+               | logical_or_expr OR logical_and_expr -> logical_or
+
+logical_and_expr: comparison_expr
+                | logical_and_expr AND comparison_expr -> logical_and
+
+comparison_expr: additive_expr EQ additive_expr  -> eq
+               | additive_expr NE additive_expr  -> ne
+               | additive_expr LT additive_expr  -> lt
+               | additive_expr GT additive_expr  -> gt
+               | additive_expr LTE additive_expr -> lte
+               | additive_expr GTE additive_expr -> gte
+               | additive_expr
+
+additive_expr: multiplicative_expr
+             | additive_expr PLUS multiplicative_expr  -> add
+             | additive_expr MINUS multiplicative_expr -> subtract
+
+multiplicative_expr: unary_expr
+                   | multiplicative_expr MUL unary_expr -> multiply
+                   | multiplicative_expr DIV unary_expr -> divide
+
+unary_expr: MINUS unary_expr -> unary_minus
+          | atom
+
+atom: NUMBER             -> number_literal
+    | VARIABLE           -> variable_ref
+    | NAME               -> bare_variable_ref
+    | STRING             -> string_literal
+    | function_call
+    | CURRENT            -> current_ref
+    | PARENT             -> parent_ref
+    | LPAR logical_or_expr RPAR -> parentheses
+
+
+function_call: NAME LPAR (logical_or_expr (COMMA logical_or_expr)*)? RPAR
