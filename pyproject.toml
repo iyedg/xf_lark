@@ -17,3 +17,6 @@ xf_parse = "xf_lark.cli:app"
 
 [tool.uv]
 package = true
+
+[tool.pyright]
+reportAny = "none"
