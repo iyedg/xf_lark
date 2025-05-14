@@ -1,22 +1,30 @@
 [project]
 name = "xf-lark"
-version = "0.1.0"
-description = "Add your description here"
-readme = "README.md"
+version = "0.1.0" 
+description = "A Python parser for XLSForm expressions using the Lark parsing toolkit."
+readme = "README.md" 
 requires-python = ">=3.12"
+authors = [
+    {name = "Iyed GHEDAMSI", email = "contact@iyedg.me"},
+]
+keywords = ["parser", "lark", "xlsform", "expression", "ast"] 
 dependencies = [
     "click>=8.1.8",
     "lark>=1.2.2",
+    "typer>=0.15.3",
+    "rich>=13.0.0",
+]
+[project.optional-dependencies]
+dev = [
     "pytest>=8.3.5",
     "pytest-sugar>=1.0.0",
-    "typer>=0.15.3",
+    "mkdocs-material>=9.6.14",
+    "mkdocs-literate-nav>=0.6.2",
 ]
-
 [project.scripts]
 xf_parse = "xf_lark.cli:app"
-
 [tool.uv]
 package = true
-
 [tool.pyright]
-reportAny = "none"
+reportAny = "none" 
+pythonVersion = "3.12" 
