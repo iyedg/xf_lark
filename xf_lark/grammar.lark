@@ -8,6 +8,7 @@ PLUS: "+"
 MINUS: "-"
 MUL: "*"
 DIV: "div"
+MOD: "mod"
 LPAR: "("
 RPAR: ")"
 COMMA: ","
@@ -46,6 +47,7 @@ additive_expr: multiplicative_expr
 multiplicative_expr: unary_expr
                    | multiplicative_expr MUL unary_expr -> multiply
                    | multiplicative_expr DIV unary_expr -> divide
+                   | multiplicative_expr MOD unary_expr -> modulus
 
 unary_expr: MINUS unary_expr -> unary_minus
           | atom
